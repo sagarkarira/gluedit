@@ -97,14 +97,14 @@ var options = {
 // attach the express server to sharejs
 sharejs.server.attach(app, options);
 
-sharejs.client.open('wyt4p', 'text', 'http://localhost:8000/channel',  (error, doc)=>{
-    if (error) {
-        console.log(error);
-    }
-    doc.on('change', function(op) {
-        console.log(op);
-    })
-})
+// sharejs.client.open('wyt4p', 'text', 'http://localhost:8000/channel',  (error, doc)=>{
+//     if (error) {
+//         console.log(error);
+//     }
+//     doc.on('change', function(op) {
+//         console.log(op);
+//     })
+// })
 
 
 

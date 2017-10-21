@@ -59,7 +59,7 @@ function realTime(server) {
 			let userName = data.userName;
 			let message = data.message;
 
-			client.to(editorName).broadcast.emit('message', data);
+			client.to(editorName).emit('message', data);
 			logging.trace(logconf, `Editor : ${editorName} 
 				New message from ${userName}
 				Message : ${message}`);

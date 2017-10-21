@@ -1,1 +1,57 @@
 .CodeMirror {border-top: 1px solid black; border-bottom: 1px solid black; border-left: 1px solid black; border-right: 1px solid black; }
+
+#user_list {
+  height: 40vh;
+  overflow: scroll;
+}
+
+#user_list > h3 {
+  font-weight: bold;
+  font-size: 1.3em;
+  padding: 1em 0.5em;
+  background: #FEE;
+}
+
+#user_list > ul {
+  list-style: none;
+  padding: 0;
+}
+
+#user_list > ul > li {
+  padding: 0.5em;
+  background: #EEF;
+  color: black;
+  margin: 0.5em 0;
+}
+
+.mytext {
+  width: 100%;
+}
+
+#message {
+  height: 40vh;
+  list-style: none;
+  padding: 0.5em;
+  border: 1px dashed #DDD;
+  overflow: scroll;
+}
+
+#message > li {
+  padding: 0.5em 0;
+}
+
+#message > li > .uid {
+  font-weight: bold;
+  text-decoration: underline;
+}
+
+#message > li.system {
+  font-weight: 300;
+  text-align: right;
+  font-size: 0.9em;
+  color: gray;
+}
+
+#message > li > .text {
+  font-weight: 400;
+}

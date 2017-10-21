@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<title></title>
+    <title></title>
     <!-- custom css -->
     <link rel="stylesheet" href="../lib/css/main.css">
     <!-- bootstrap css -->
@@ -42,39 +42,38 @@
             </div>
         </div>
 
-        
-    </div>
+        <div class="row">
+          <div class="col-md-9">
+            <p id="editor_name">Editor Name : </p>
+            <p id="user_name">User Name : </p>
+            <p id="share_url">Share URL: </p>
 
-
-
-	<h3 id="editor_name">Editor Name : </h3>
-    <h3 id="user_name">User Name : </h3>
-	<h3 id="share_url">Share URL: </h3>
-
-	<h3> User List </h3>
-	<div id="user_list">
-
-	</div >
-
-	<div id="chat_box" >
-    </div>
-
-    <div class="col-sm-3 col-sm-offset-4 frame">
-        <ul id="message"></ul>
-        <div>
-            <div class="msj-rta macro" style="margin:auto">                        
-                <div class="text text-r" style="background:whitesmoke !important">
-                    <input class="mytext" placeholder="Type a message"/>
-                </div> 
+            <textarea class="form-control" id="id_content"   name="content" >default text</textarea>
+          </div>
+          <div class="col-md-3">
+            <div id="user_list">
+              <h3> User List </h3>
+              <ul></ul>
             </div>
+            <div>
+              <ul id="message">
+                <li class="system">
+                  <span class='text'> Chat box initialized </span>
+                </li>
+
+              </ul>
+              <div>
+                <div class="msj-rta macro" style="margin:auto">
+                    <div class="text text-r" style="background:whitesmoke !important">
+                      <input id="inputMessage" placeholder="Type a message"/>
+                    </div>
+                  </div>
+                </div>
+            </div>
+
+          </div>
         </div>
-    </div>        
-
-
-
-    <textarea class="form-control" id="id_content"   name="content" >default text</textarea>
-
-
+    </div>
 </body>
 </html>
 
@@ -105,19 +104,20 @@
 var doc = null, editor = null;
 
 window.onload = function() {
-	data = JSON.parse(`<%- data%>`);
-    const { 
-    	editorObject, 
-    	userName, 
-    	users 
+    data = JSON.parse(`<%- data%>`);
+    const {
+        editorObject,
+        userName,
+        users
     } = data;
     console.log(editorObject, userName, users);
     let editorName = editorObject.editorName;
-    
+
     showEditorName(editorName);
     showUserName(userName);
     showUsers(users);
     showShareUrl(editorName);
+    addMessage(`${userName} has joined the editor`);
 
     var options = {
         origin: "http://localhost:8000/channel"
@@ -135,13 +135,13 @@ window.onload = function() {
             "F11": function(cm) {
                 cm.setOption("fullScreen", !cm.getOption("fullScreen"));
             },
-          
+
             "Esc": function(cm) {
                 if (cm.getOption("fullScreen")) {
-                    cm.setOption("fullScreen", false);   
+                    cm.setOption("fullScreen", false);
                 }
             }
-        }      
+        }
     };
     editor = CodeMirror.fromTextArea(textElement, settings);
     editor.setSize(800, 800);
@@ -152,42 +152,62 @@ window.onload = function() {
             console.log(error);
         }
         doc.attach_cm(editor);
-    });        
+    });
 
 
     const socket = io.connect("http://localhost:8000");
     socket.on("connect",  () => {
         console.log("Connected!");
         let joinObject = {
-        	editorName : editorName, 
-        	userName: userName
+            editorName : editorName,
+            userName: userName
         };
 
-        // let the server know that a user has joined 
+        // let the server know that a user has joined
         socket.emit('join', joinObject);
 
         // add user join msg to chat box
         socket.on('userJoin', (userName)=>{
-            console.log(`${userName} has joined the editor`);
+            let message = `${userName} has joined the editor`;
+            console.log(message);
             userJoin(userName);
+            addMessage(message);
         });
 
         // add user left msg to chat box
         socket.on('userLeft', (userName)=>{
-            console.log(`${userName} has left the editor`);
+            let message = `${userName} has left the editor`; 
+            console.log(message);
             userLeft(userName);
+            addMessage(message);
         });
 
         // add message to chat box
         socket.on('message', (data)=>{
             console.log(data);
-        })
+            let {message, userName} = data;
+            addMessage(message, userName);
+        });
+
+        let messageObject = document.getElementById('inputMessage');
+        messageObject.addEventListener('keydown', (event)=>{
+            let message = messageObject.value;
+            if (event.keyCode == 13) {
+                socket.emit('message', {
+                    userName : userName,
+                    editorName : editorName,
+                    message : messageObject.value
+                });
+                addMessage(message, userName);
+                messageObject.value = "";
+            }
+        });
     });
 }
 
 function showEditorName(editorName) {
-	let elem = document.getElementById("editor_name");
-	elem.innerHTML += editorName;
+    let elem = document.getElementById("editor_name");
+    elem.innerHTML += editorName;
 }
 
 function showUserName(userName) {
@@ -196,23 +216,20 @@ function showUserName(userName) {
 }
 
 function showUsers(users) {
-	let elem = document.getElementById("user_list");
-	let list = " <ul> \n";
-	users.forEach((user)=>{
-		list += `<li id="${user}"> ${user} </li> \n`; 
-	});
-	list += " <ul> "
-	elem.innerHTML = list;
+    const elem = $("#user_list > ul");
+    users.forEach((user)=>{
+    elem.append(`<li id="${user}"> ${user} </li>`);
+    });
 }
 
 function showShareUrl(editorName) {
-	let elem = document.getElementById("share_url");
-	elem.innerHTML += window.location.href;
+    let elem = document.getElementById("share_url");
+    elem.innerHTML += window.location.href;
 }
 
 
 function userJoin(userName) {
-    $("#user_list").children("ul").append(`<li id="${userName}"> ${userName} </li> `);
+    $("#user_list > ul").append(`<li id="${userName}"> ${userName} </li> `);
 }
 
 function userLeft(userName) {
@@ -225,11 +242,23 @@ function selectTheme() {
     editor.setOption("theme", theme);
 }
 
+function addMessage(message, userName) {
+    if (userName === undefined) {
+        $('#message').append(
+            `<li class="system">
+                <span class='text'>${message}</span>
+            </li>`);
+    } else {
+        $('#message').append(
+            `<li>
+                <span class='uid'>${userName}</span>
+                <span class='text'> ${message} </span>
+            </li>`);
+    }
+}
 
-	
+
 </script>
-
-
 
 <script>
 

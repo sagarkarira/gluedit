@@ -20,7 +20,11 @@ let logconf = {
 	loggingEnabled : true
 };
 
-//check user name
+/**
+ * TODOS
+ * 1.username should not contain spaces
+ * 2.username should be unique to a channel
+ */
 
 function initialize(req, res) {
 	logging.trace(logconf, "INCOMING REQUEST", req.query, req.params, req.body);
