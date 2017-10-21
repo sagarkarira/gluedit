@@ -1,0 +1,2 @@
+# gluEdit
+simple collaborative editor
