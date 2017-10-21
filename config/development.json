@@ -1,0 +1,8 @@
+{
+    "port" : 8000, 
+    "redisConfig" : {
+        "host": "localhost",
+        "port": "6379",
+        "db": 0
+      }
+}

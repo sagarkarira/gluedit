@@ -1,0 +1,22 @@
+{
+  "name": "collab-edit",
+  "description": "",
+  "main": "app.js",
+  "authors": [
+    "Sagar Karira <sagar.karira@mail.jugnoo.in>"
+  ],
+  "license": "ISC",
+  "homepage": "",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "bootstrap": "^3.3.7",
+    "codemirror": "^5.30.0",
+    "clipboard": "^1.7.1"
+  }
+}

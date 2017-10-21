@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+  <!-- custom style for this page -->
+  <title> gluEdit  </title>
+
+  <!-- Bootstrap -->
+  <!-- Latest compiled and minified CSS -->
+  <link rel="stylesheet" href="lib/bootstrap/dist/css/bootstrap.min.css">
+  <!-- Optional theme -->
+  <link rel="stylesheet" href="lib/bootstrap/dist/css/bootstrap-theme.min.css">
+  <link rel="stylesheet" type="text/css" href="lib/css/home.css">
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+
+</head>
+
+<body>
+
+<div class="container-fluid">
+
+  <div class="header row">
+
+    <div class="col-sm-12 logo">
+      <div class="row">
+        <h1 class="col-sm-12"> gluEdit </h1>
+      </div>
+    </div> <!-- logo -->
+
+    <div class="col-sm-12 inst">
+      <p>
+        A simple collabrative editor
+      </p>  
+      
+      <p>  
+        Click on the button to get started.
+      </p> 
+        If you leave the field blank we will create a document for you. 
+        Also we will give you a cool username. 
+      </p>
+    </div>
+
+  </div> <!-- header -->
+
+
+  <div class="row main">
+
+    <div class="col-sm-6 col-sm-offset-3">
+
+      <form class="form-horizontal"  action="/editor" method="post" id="form">
+
+        <div class="form-group">
+          <label for="room" class="col-sm-3 control-label"> Document </label>
+          <div class="col-sm-9">
+            <input type="text" name="editorName" class="form-control" id="document" placeholder="Enter document name to create" >
+          </div>
+        </div> <!-- Room input -->
+
+
+        <div class="form-group">
+          <label for="nickname" class="col-sm-3 control-label"> Nickname </label>
+          <div class="col-sm-9">
+            <input type="text" name="userName" class="form-control" id="username" placeholder="Enter your username" >
+          </div>
+        </div> <!-- nickname input -->
+
+        <div class="form-group">
+            <div class="col-sm-12">
+              <button class="btn btn-default col-sm-12" id="new_document" > New Document </button>
+            </div>
+        </div> <!-- room input -->
+
+      </form> <!-- form -->
+
+    </div> <!-- col -->
+
+  </div> <!-- main -->
+
+  <div class="row">
+    <div class="col-sm-6 col-sm-offset-3" id="info"></div>
+  </div>
+
+
+</div> <!-- container -->
+
+<script>
+
+$("#new_document").on("click", function(e){
+    e.preventDefault();
+    let userName = $('#username').val();
+    let editorName =  $('#document').val();
+    
+    if (editorName === "") {
+        editorName = (Math.random() + 1).toString(36).substr(2,5);
+    }
+    console.log(editorName);
+
+    $('#form').attr('action', `/editor/${editorName}`).submit();
+});
+
+// $('#new_document').click((event) => {
+//    event.preventDefault();
+//    $.ajax({
+//       type: 'POST',
+//       url : 'http://' + location.hostname + ':' + location.port + '/editor',
+//       data :  {
+//           "userName" : $('#username').val(), 
+//           "editorName" : $('#document').val()
+//       },
+//       dataType: 'json',
+//       success: function(data) {
+//         $("body").html(data)
+//          console.log(data);
+//          if (data.error) {
+
+//          }else{
+
+//          }
+//       },
+//       error: function(data) {
+//           console.log(data);
+
+//       }
+//   });
+// })
+
+</script>
+
+</body>
+
+</html>

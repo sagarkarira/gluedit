@@ -1,0 +1,240 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+    <!-- <link rel="stylesheet" type="text/css" charset="utf-8" media="screen" href="lib/css/pastebin.css"> -->
+
+
+  <script src="lib/codemirror/lib/codemirror.js"></script>
+  <script src="lib/codemirror/addon/display/fullscreen.js"></script>
+  <script src="lib/codemirror/addon/hint/show-hint.js"></script>
+  <script src="lib/codemirror/addon/hint/javascript-hint.js"></script>
+
+  <script src="lib/jquery/dist/jquery.min.js"></script>
+
+  <script src="lib/codemirror/mode/javascript/javascript.js"></script>
+  <script src="lib/codemirror/addon/selection/active-line.js"></script>
+  <script src="lib/codemirror/addon/edit/matchbrackets.js"></script>
+  <link rel="stylesheet" href="lib/codemirror/lib/codemirror.css">
+  <link rel="stylesheet" href="lib/codemirror/addon/display/fullscreen.css">
+
+  <link rel="stylesheet" href="lib/font-awesome/css/font-awesome.min.css">
+  <link rel="stylesheet" href="lib/bootstrap-social/bootstrap-social.css">
+
+
+  <!-- Themes files for code mirror -->
+
+  <link rel="stylesheet" href="lib/codemirror/theme/3024-day.css">
+  <link rel="stylesheet" href="lib/codemirror/theme/3024-night.css">
+  <link rel="stylesheet" href="lib/codemirror/theme/ambiance.css">
+  <link rel="stylesheet" href="lib/codemirror/theme/elegant.css">
+  <link rel="stylesheet" href="lib/codemirror/theme/ttcn.css">
+  
+  <link rel="stylesheet" href="lib/bootstrap/dist/css/bootstrap.min.css">
+  <script src="lib/bootstrap/dist/js/bootstrap.min.js"></script>
+  
+
+  
+  
+  
+  <style type="text/css">
+
+    .CodeMirror {
+        border-top: 1px solid black; 
+        border-bottom: 1px solid black; 
+        border-left: 1px solid black; 
+        border-right: 1px solid black; 
+    }
+    
+    /*.CodeMirror-activeline-background {background: #e8f2ff !important;}*/
+  </style>        
+    <title>gluEdit</title>
+</head>
+
+<body>
+  <div class="container">
+    <div class="row">  
+      <div class="col-sm-10">
+        <img height="30%" width= "30%" class="img-responsive" src="/lib/images/glupaste.jpg">
+        </img>
+      </div>
+
+    
+    <div class="col-sm-2">
+      <br/>
+      <label></label>
+      <select class="form-control" onchange="selectTheme()" id="select">
+        <option selected>default</option>
+        <option>3024-day</option>
+        <option>3024-night</option>
+        <option>ambiance</option>
+        <option>elegane</option>
+        <option>ttcn</option>
+      </select>
+
+    <br/>
+
+      <a class="btn btn-social-icon btn-twitter">
+          <span class="fa fa-twitter"></span>
+      </a>
+
+      <a class="btn btn-social-icon btn-twitter">
+          <span class="fa fa-facebook"></span>
+      </a>
+
+      <a class="btn btn-social-icon btn-twitter">
+          <span class="fa fa-github"></span>
+      </a>
+  </div>
+  </div>
+  <br/>
+<legend></legend>
+<div class="row">
+        <form action="/" method="POST" id="pasteform" name="pasteform" class="form-horizontal">
+<fieldset>
+
+<!-- Form Name -->
+
+
+<!-- Text input-->
+<div class="form-group">
+  <label class="col-md-4 control-label" for="">Author</label>  
+  <div class="col-md-4">
+  <input id="id_poster" type="text" name="poster" maxlength="30" required placeholder="" class="form-control input-md">
+    
+  </div>
+</div>
+
+
+
+<!-- Select Basic -->
+<div class="form-group">
+  <label class="col-md-4 control-label" for="selectbasic">Language</label>
+  <div class="col-md-4">
+    <select name="syntax" id="id_syntax" onchange="myFunction()" class="form-control">
+      <option value="txt" id="plaintxt"> Plain Text </option>
+      <option value="clike" id="text/x-csrc" > C </option>
+      <option value="cpp" id="text/x-c++src"> Cpp </option>
+      <option value="python" id="python"> Python </option>
+      <option value="php" id="php"> PHP </option>
+      <option value="javascript" id="javascript" selected="selected">JavaScript </option>
+      <option value="java" id="text/x-java"> Java</option>
+      <option value="bash" id="bash"> BASH</option>
+      <option value="matlab" id="matlab"> MATLAB </option>
+      <option value="makefile" id="make"> Makefile </option>
+      <option value="tcl" id="tcl"> TCL </option>
+      <option value="sql" id="sql">SQL </option>
+      <option value="xml" id="xml"> XML</option>
+    </select>
+  </div>
+</div>
+<!-- Textarea -->
+<div class="form-group">
+  <label class="col-md-4 control-label" for="textarea">Text Area</label>
+  <div class="col-md-4">                     
+    <textarea class="form-control" id="id_content"   name="content" >default text</textarea>
+  </div>
+</div>
+
+<div class="form-group">
+  <div class="col-md-4 col-md-offset-4">                     
+    <input type="submit" class="btn btn-danger" value="Paste it !">
+  </div>
+</div>
+
+
+</fieldset>
+</form>
+</div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.3/socket.io.js"></script>
+
+<script type="text/javascript"> 
+
+
+  // var myCodeMirror = CodeMirror.fromTextArea(document.getElementById("id_content"),{
+  //   value: "function myScript(){return 100;}\n",
+  //   mode:  "javascript"
+  // });
+  
+    const language = "javascript";
+    const editor = CodeMirror.fromTextArea(document.getElementById("id_content"), {
+          lineNumbers: true,
+          mode:"javascript",
+          styleActiveLine: true,
+          matchBrackets: true,
+          lineWrapping: true,
+          extraKeys: {"Ctrl-Space": "autocomplete"},
+
+          extraKeys: {
+          "F11": function(cm) {
+            cm.setOption("fullScreen", !cm.getOption("fullScreen"));
+          },
+          
+          "Esc": function(cm) {
+            if (cm.getOption("fullScreen")) cm.setOption("fullScreen", false);
+          }
+          }
+          
+    });
+
+
+    editor.setSize(700, 330);
+    editor.getOption("fullScreen");
+
+    const socket = io.connect("http://localhost:8000");
+    // const editorArea = document.getElementById("editor-area");
+
+    socket.on("connect",  () => {
+        console.log("Connected!");
+        editor.on("keyup", () => {
+            socket.emit('change', {text : editor.getValue()} );
+        })
+    });
+
+    socket.on('change', (data) => {
+        console.log(data);
+        editor.setValue(data.text)  ;
+    });
+
+
+
+  function myFunction() {
+    var input = document.getElementById("id_syntax");
+    var language = input.options[input.selectedIndex].getAttribute("id");
+    editor.setOption("mode", language);
+
+  }
+
+  var input = document.getElementById("select");
+
+  function selectTheme() {
+    var theme = input.options[input.selectedIndex].textContent;
+    editor.setOption("theme", theme);
+    location.hash = "#" + theme;
+  }
+  var choice = (location.hash && location.hash.slice(1)) ||
+             (document.location.search &&
+              decodeURIComponent(document.location.search.slice(1)));
+  if (choice) {
+    input.value = choice;
+    editor.setOption("theme", choice);
+  }
+  CodeMirror.on(window, "hashchange", function() {
+    var theme = location.hash.slice(1);
+    if (theme) { 
+      input.value = theme; selectTheme(); 
+    }
+  });
+
+  </script>
+
+</body>
+</html>
+
+
+
+
+ 

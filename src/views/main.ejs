@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title></title>
+    <!-- custom css -->
+    <link rel="stylesheet" href="../lib/css/main.css">
+    <!-- bootstrap css -->
+    <link rel="stylesheet" href="../lib/bootstrap/dist/css/bootstrap.min.css">
+
+    <!-- codemirror css -->
+    <link rel="stylesheet" href="../lib/codemirror/lib/codemirror.css">
+    <link rel="stylesheet" href="../lib/codemirror/addon/display/fullscreen.css">
+
+    <!-- Themes files for code mirror -->
+
+    <link rel="stylesheet" href="../lib/codemirror/theme/3024-day.css">
+    <link rel="stylesheet" href="../lib/codemirror/theme/3024-night.css">
+    <link rel="stylesheet" href="../lib/codemirror/theme/ambiance.css">
+    <link rel="stylesheet" href="../lib/codemirror/theme/elegant.css">
+    <link rel="stylesheet" href="../lib/codemirror/theme/ttcn.css">
+
+
+
+</head>
+<body>
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-10">
+                <h3>gluEdit</h3>
+            </div>
+
+            <div class="col-sm-2">
+                <br/>
+                <select class="form-control" onchange="selectTheme()" id="theme">
+                  <option selected>default</option>
+                  <option>3024-day</option>
+                  <option>3024-night</option>
+                  <option>ambiance</option>
+                  <option>elegane</option>
+                  <option>ttcn</option>
+                </select>
+            </div>
+        </div>
+
+        
+    </div>
+
+
+
+	<h3 id="editor_name">Editor Name : </h3>
+    <h3 id="user_name">User Name : </h3>
+	<h3 id="share_url">Share URL: </h3>
+
+	<h3> User List </h3>
+	<div id="user_list">
+
+	</div >
+
+	<div id="chat_box" >
+    </div>
+
+    <div class="col-sm-3 col-sm-offset-4 frame">
+        <ul id="message"></ul>
+        <div>
+            <div class="msj-rta macro" style="margin:auto">                        
+                <div class="text text-r" style="background:whitesmoke !important">
+                    <input class="mytext" placeholder="Type a message"/>
+                </div> 
+            </div>
+        </div>
+    </div>        
+
+
+
+    <textarea class="form-control" id="id_content"   name="content" >default text</textarea>
+
+
+</body>
+</html>
+
+<!-- jquery and bootstrap script -->
+<script src="../lib/jquery/dist/jquery.min.js"></script>
+<script src="../lib/bootstrap/dist/js/bootstrap.min.js"></script>
+
+<!-- code mirror scripts -->
+<script src="../lib/codemirror/lib/codemirror.js"></script>
+<script src="../lib/codemirror/mode/javascript/javascript.js"></script>
+
+<script src="../lib/codemirror/addon/selection/active-line.js"></script>
+<script src="../lib/codemirror/addon/edit/matchbrackets.js"></script>
+
+<!-- socket io script -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.3/socket.io.js"></script>
+
+<!-- Share JS FILES -->
+<script src="../lib/webclient/bcsocket.js"></script>
+<script src="../lib/webclient/share.uncompressed.js"></script>
+<script src="../lib/webclient/textarea.js"></script>
+<script src="../lib/webclient/cm.js"></script>
+
+
+
+
+<script>
+var doc = null, editor = null;
+
+window.onload = function() {
+	data = JSON.parse(`<%- data%>`);
+    const { 
+    	editorObject, 
+    	userName, 
+    	users 
+    } = data;
+    console.log(editorObject, userName, users);
+    let editorName = editorObject.editorName;
+    
+    showEditorName(editorName);
+    showUserName(userName);
+    showUsers(users);
+    showShareUrl(editorName);
+
+    var options = {
+        origin: "http://localhost:8000/channel"
+    }
+
+    let textElement = document.getElementById("id_content");
+    let settings = {
+        lineNumbers: true,
+        mode:"javascript",
+        styleActiveLine: true,
+        matchBrackets: true,
+        lineWrapping: true,
+        extraKeys: {"Ctrl-Space": "autocomplete"},
+        extraKeys: {
+            "F11": function(cm) {
+                cm.setOption("fullScreen", !cm.getOption("fullScreen"));
+            },
+          
+            "Esc": function(cm) {
+                if (cm.getOption("fullScreen")) {
+                    cm.setOption("fullScreen", false);   
+                }
+            }
+        }      
+    };
+    editor = CodeMirror.fromTextArea(textElement, settings);
+    editor.setSize(800, 800);
+    editor.getOption("fullScreen");
+
+    sharejs.open(editorObject.editorName, 'text', options, (error, doc) => {
+        if (error) {
+            console.log(error);
+        }
+        doc.attach_cm(editor);
+    });        
+
+
+    const socket = io.connect("http://localhost:8000");
+    socket.on("connect",  () => {
+        console.log("Connected!");
+        let joinObject = {
+        	editorName : editorName, 
+        	userName: userName
+        };
+
+        // let the server know that a user has joined 
+        socket.emit('join', joinObject);
+
+        // add user join msg to chat box
+        socket.on('userJoin', (userName)=>{
+            console.log(`${userName} has joined the editor`);
+            userJoin(userName);
+        });
+
+        // add user left msg to chat box
+        socket.on('userLeft', (userName)=>{
+            console.log(`${userName} has left the editor`);
+            userLeft(userName);
+        });
+
+        // add message to chat box
+        socket.on('message', (data)=>{
+            console.log(data);
+        })
+    });
+}
+
+function showEditorName(editorName) {
+	let elem = document.getElementById("editor_name");
+	elem.innerHTML += editorName;
+}
+
+function showUserName(userName) {
+    let elem = document.getElementById("user_name");
+    elem.innerHTML += userName;
+}
+
+function showUsers(users) {
+	let elem = document.getElementById("user_list");
+	let list = " <ul> \n";
+	users.forEach((user)=>{
+		list += `<li id="${user}"> ${user} </li> \n`; 
+	});
+	list += " <ul> "
+	elem.innerHTML = list;
+}
+
+function showShareUrl(editorName) {
+	let elem = document.getElementById("share_url");
+	elem.innerHTML += window.location.href;
+}
+
+
+function userJoin(userName) {
+    $("#user_list").children("ul").append(`<li id="${userName}"> ${userName} </li> `);
+}
+
+function userLeft(userName) {
+    $(`#${userName}`).remove();
+}
+
+function selectTheme() {
+    var input = document.getElementById("theme");
+    var theme = input.options[input.selectedIndex].textContent;
+    editor.setOption("theme", theme);
+}
+
+
+	
+</script>
+
+
+
+<script>
+
+</script>
