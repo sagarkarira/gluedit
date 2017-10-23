@@ -23,7 +23,7 @@ let logconf = {
 /**
  * TODOS
  * 1.username should not contain spaces
- * 2.username should be unique to a channel
+ * 2.username should be unique to a channel (no duplicates)
  */
 
 function initialize(req, res) {
@@ -39,6 +39,7 @@ function initialize(req, res) {
 	initializeRunner(editorName, userName)
 		.then((result)=>{
 			logging.trace(logconf, 'RESPONSE SENT', result );
+			console.log(result);
 			res.render('main', {data : JSON.stringify(result)});
 		})
 		.catch((error)=>{
@@ -52,12 +53,12 @@ async function initializeRunner(editorName, userName) {
 	let exists = await redisClient.existsAsync(editorKey);
 
 	if (exists === 0 ) {
-		logging.debug(logconf, "Editor does not exists", exists);	
+		logging.debug(logconf, "Editor does not exists");	
 		let editorObject = {
 			editorName : editorName, 
-			version : 1, 
-			content : "", 
-			lang : "none"
+			version : 1,  
+			lang : "none", 
+			charMap : []
 		};
 		await redisClient.setAsync(editorKey, JSON.stringify(editorObject));
 		if (userName === undefined) {
@@ -68,7 +69,7 @@ async function initializeRunner(editorName, userName) {
 		return {
 			editorObject : editorObject, 
 			userName : userName,
-			users : [userName] 
+			users : [userName]
 		};
 	}
 
@@ -80,7 +81,7 @@ async function initializeRunner(editorName, userName) {
 		userName = `${animals()}`
 	}
 	// fix duplicate problem bug 
-	// small probability that the random generated name is duplicated
+	// small chance that the random generated name is duplicated
 	userList.push(userName);
 	await redisClient.saddAsync(usersKey, userName);
 
@@ -91,3 +92,10 @@ async function initializeRunner(editorName, userName) {
 	};
 }
 
+async function getUserList() {
+
+}
+
+async function getDocSnapshot() {
+
+}

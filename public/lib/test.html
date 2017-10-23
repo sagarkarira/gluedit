@@ -20,6 +20,8 @@
   
     <link rel="stylesheet" href="./bootstrap/dist/css/bootstrap.min.css">
     <script src="./bootstrap/dist/js/bootstrap.min.js"></script>
+    <script src="./logoot.js"></script>
+
 </head>
 
 <body>
@@ -48,6 +50,23 @@
             }      
         };
         const editor = CodeMirror.fromTextArea(element, settings);
-        Codemirror.
+
+    </script>
+    <script>
+    editor.on('change', (ed, data) =>{
+        console.log(data);
+        let index = data.from.ch;
+        let ch = data.text[0];
+        let ch2 = data.text[1];
+        if (data.origin === '+input') {
+            if (ch === "" && ch2 === "" ) {
+                return localInsertChar('\n', index);    
+            } 
+            localInsertChar(ch, index); 
+        }
+        if (data.origin === '+delete') {
+            return localDeleteChar(ch, index);
+        }
+    })
     </script>
 </body>
