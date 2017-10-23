@@ -348,13 +348,13 @@ function localInsertChar(ch, index, socket, editorName, charMap, siteNumber) {
                 }]
             };            
         } else {
-            let position1 = charMap[index-1].position;
+            let position1 = charMap[charMap.length - 1].position;
             charObj = {
                 value : ch, 
                 position : generatePositionBetween(position1, [], siteNumber )
             };    
         }
-        charMap[index] = charObj;
+        charMap.push(charObj);
     } 
     else if (index === 0 && charMap[1] !== undefined ) {
         console.log('Insert in beginning'); 
@@ -419,8 +419,8 @@ function insertRemoteChar(charObj, charMap) {
         if (comparePosition(position, charMap[index].position) < 0) {
             // insert ch at index 
             console.log('Remote insert in b/w at :', index);
-            editor.replaceRange(ch, editor.posFromIndex(index));
             charMap.splice(index, 0, charObj);
+            editor.replaceRange(ch, editor.posFromIndex(index));
             return;
         }
     }
