@@ -168,9 +168,10 @@ let p1 = [{
    
 let p2 =  [{
     site : 1 , 
-    digit : 2
+    digit : 255
 }];
 
 
-console.log(generatePositionBetween(p1, p2, 0));
+// console.log(generatePositionBetween([ { digit: 1, site: 1 }, { digit: 2, site: 1 } ], [ { digit: 1, site: 1 }, { digit: 3, site: 2 } ], 1));
+console.log(generatePositionBetween([ { digit: 1, site: 1 }, { digit: 2, site: 1 } ],[],1));
 

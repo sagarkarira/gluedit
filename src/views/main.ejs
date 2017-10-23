@@ -105,6 +105,7 @@
 
 <script>
 var editor = null;
+var siteNumber = Math.floor(Math.random() * 100)
 
 window.onload = function() {
     let data = JSON.parse(`<%- data%>`);
@@ -217,9 +218,9 @@ window.onload = function() {
             if (data.origin === '+input') {
                 // code mirror check for new line
                 if (ch === "" && ch2 === "" ) {
-                    return localInsertChar('\n', index, socket, editorName,charMap);
+                    return localInsertChar('\n', index, socket, editorName,charMap, siteNumber);
                 }
-                localInsertChar(ch, index, socket, editorName, charMap); 
+                localInsertChar(ch, index, socket, editorName, charMap, siteNumber); 
             }
             if (data.origin === '+delete' && data.removed[0].length === 1)  {
                 return localDeleteChar(ch, index, socket, editorName, charMap);
@@ -320,13 +321,13 @@ function addTextToCodeMirror(editor, charMap) {
 <script>
 
 // inserting character ch at the index cursor postion.
-function localInsertChar(ch, index, socket, editorName, charMap) {
+function localInsertChar(ch, index, socket, editorName, charMap, siteNumber) {
     console.log(ch, index);
     let charObj = {};
     if (index === 0 && charMap[index] === undefined) {
         console.log('Document begin');
         let beginPosition = [{
-            site : 0, 
+            site : siteNumber, 
             digit : 1
         }];
         charObj = {
@@ -338,23 +339,30 @@ function localInsertChar(ch, index, socket, editorName, charMap) {
     //inserting new characters
     else if (charMap[index] === undefined ) {
         console.log('Insert at last');
-        siteNumber = charMap[charMap.length - 1].position[0].site; 
-        charObj = {
-            value : ch, 
-            position : [{
-                site : siteNumber+1, 
-                digit : 1
-            }]
-        };
+        let nextDigit = charMap[charMap.length - 1].position[0].digit +1; 
+        if (ch === '\n') {
+            charObj = {
+                value : ch, 
+                position : [{
+                    site : siteNumber, 
+                    digit : nextDigit
+                }]
+            };            
+        } else {
+            let position1 = charMap[index-1].position;
+            charObj = {
+                value : ch, 
+                position : generatePositionBetween(position1, [], siteNumber )
+            };    
+        }
         charMap[index] = charObj;
     } 
-
     else if (index === 0 && charMap[1] !== undefined ) {
         console.log('Insert in beginning'); 
         let position2 = charMap[1].position;
         charObj = {
             value : ch, 
-            position : generatePositionBetween([], position2, 0 )
+            position : generatePositionBetween([], position2, siteNumber )
         }
         charMap.splice(parseInt(index), 0, charObj );
     }
@@ -364,7 +372,6 @@ function localInsertChar(ch, index, socket, editorName, charMap) {
         console.log('Insert in b/w');
         let position1 = charMap[index-1].position;
         let position2 = charMap[index].position;
-        let siteNumber = position1[0].site;
         // console.log(position1, position2, siteNumber);
         charObj = {
             value : ch, 
