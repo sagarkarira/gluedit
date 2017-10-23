@@ -110,17 +110,16 @@ window.onload = function() {
     let data = JSON.parse(`<%- data%>`);
     const {
         editorObject,
-        userName,
-        users
+        userName
     } = data;
-    console.log(editorObject, userName, users);
+    console.log(editorObject, userName);
     const editorName = editorObject.editorName;
     const charMap = editorObject.charMap;
 
 
     showEditorName(editorName);
     showUserName(userName);
-    showUsers(users);
+    showUsers(editorName);
     showShareUrl(editorName);
     addMessage(`${userName} has joined the editor`);
     // let options = {
@@ -257,11 +256,22 @@ function showUserName(userName) {
     elem.innerHTML += userName;
 }
 
-function showUsers(users) {
-    const elem = $("#user_list > ul");
-    users.forEach((user)=>{
-    elem.append(`<li id="${user}"> ${user} </li>`);
-    });
+function showUsers(editorName) {
+    $.ajax({
+        type: 'GET',
+        url : 'http://' + location.hostname + ':' + location.port + '/users/' + editorName,
+        dataType: 'json',
+        success: function(data) {
+            let users = data.users;
+            const elem = $("#user_list > ul");
+            users.forEach((user)=>{
+                elem.append(`<li id="${user}"> ${user} </li>`);
+            });
+        },
+        error: function(data) {
+            console.log(data);
+        }
+    })
 }
 
 function showShareUrl(editorName) {
@@ -299,10 +309,10 @@ function addMessage(message, userName) {
     }
 }
 function addTextToCodeMirror(editor, charMap) {
-    let text = charMap.map((obj)=>{
+    let textArr = charMap.map((obj)=>{
         return obj.value;
     });
-    editor.setValue(text.join(''));
+    editor.setValue(textArr.join(''));
 }
 
 </script>

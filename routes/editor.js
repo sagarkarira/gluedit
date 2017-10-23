@@ -1,7 +1,8 @@
 'use strict';
 
 module.exports = {
-	initialize
+	initialize, 
+	getUserList
 }
 
 const redisClient = require('./redis');
@@ -29,7 +30,7 @@ let logconf = {
 function initialize(req, res) {
 	logging.trace(logconf, "INCOMING REQUEST", req.query, req.params, req.body);
 
-	let editorName = req.params.editorName 
+	let editorName = req.params.editorName;
 	let userName = req.body.userName || undefined;
 
 	if (editorName === undefined) {
@@ -39,13 +40,35 @@ function initialize(req, res) {
 	initializeRunner(editorName, userName)
 		.then((result)=>{
 			logging.trace(logconf, 'RESPONSE SENT', result );
-			console.log(result);
 			res.render('main', {data : JSON.stringify(result)});
 		})
 		.catch((error)=>{
 			logging.error(logconf, error);
 		});
 }
+
+function getUserList(req, res) {
+	logging.trace(logconf, "User List", req.query, req.params, req.body);
+
+	let editorName = req.params.editorName;
+
+	if (editorName === undefined) {
+		logging.error(logconf, "Editor name is undefined");
+	}
+	
+	getUserListRunner(editorName)
+		.then((result)=>{
+			logging.trace(logconf, result );
+			return	res.send({
+				flag: 200, 
+				users : result
+			});
+		})
+		.catch((error)=>{
+			logging.error(logconf, error);
+		});
+}
+
 
 async function initializeRunner(editorName, userName) {
 	let editorKey = parameters.keyNames.EDITOR + editorName;
@@ -68,8 +91,7 @@ async function initializeRunner(editorName, userName) {
 
 		return {
 			editorObject : editorObject, 
-			userName : userName,
-			users : [userName]
+			userName : userName
 		};
 	}
 
@@ -82,20 +104,30 @@ async function initializeRunner(editorName, userName) {
 	}
 	// fix duplicate problem bug 
 	// small chance that the random generated name is duplicated
-	userList.push(userName);
 	await redisClient.saddAsync(usersKey, userName);
 
 	return { 
 		editorObject : editorObject, 
-		userName : userName, 
-		users : userList
+		userName : userName
 	};
 }
 
-async function getUserList() {
 
+async function getUserListRunner(editorName) {
+	let editorKey = parameters.keyNames.EDITOR + editorName;
+	let usersKey = editorKey + parameters.keyNames.USERS;
+	let userList =  await redisClient.smembersAsync(usersKey);
+	console.log(usersKey);
+	return userList;	
 }
 
-async function getDocSnapshot() {
-
+async function getDocSnapshot(editorName) {
+	let editorKey = parameters.keyNames.EDITOR + editorName;
+	let editorObject = await redisClient.getAsync(editorKey);
+	editorObject =  JSON.parse(editorObject);
+	let charMap = editorObject.charMap;
+	let textArr = charMap.map((obj)=>{
+	    return obj.value;
+	});
+	return textArr.join('');
 }

@@ -75,6 +75,7 @@ app.get('/', (req, res)=>{
 app.get('/editor/:editorName', editor.initialize);
 
 app.post('/editor/:editorName',  editor.initialize);
+app.get('/users/:editorName', editor.getUserList);
 
 
 var httpsServer = http.createServer(app).listen(app.get('port'), function () {

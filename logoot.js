@@ -162,120 +162,15 @@ function rest(list) {
 
 
 let p1 = [{
-    site : 0, 
+    site : 1, 
     digit : 1    
 }];
    
 let p2 =  [{
     site : 1 , 
-    digit : 1
+    digit : 2
 }];
 
 
 console.log(generatePositionBetween(p1, p2, 0));
 
-let charMap = [];
-let value = ""; // text area value string
-let siteNumber = 0;
-if (charMap.length !== 0 ) {
-    siteNumber = charMap[charMap.length - 1].position.site;
-}
-
-// inserting character ch at the index cursor postion.
-function localInsertChar(ch, index) {
-    
-    if (index === 0 && charMap[index] === undefined) {
-        let beginPosition = [{
-            site : siteNumber, 
-            digit : 1
-        }];
-        
-        charMap[index] = {
-            value : ch, 
-            position : beginPosition
-        };
-        siteNumber++;
-    } 
-    //inserting new characters
-    else if (charMap[index+1] === undefined ) {
-        charMap[index] = {
-            value : ch, 
-            position : {
-                site : siteNumber, 
-                digit : 1
-            }
-        };
-        siteNumber++;
-    } 
-
-    // inserting characters in b/w other characters
-    else if (charMap[index-1] !== undefined 
-        && charMap[index+1] !== undefined 
-        && charMap[index] === undefined
-        ) {
-        let position1 = charMap[index-1].position;
-        let position2 = charMap[index-1].position;
-        let siteNumber = position1.site;
-
-        charMap[index] = {
-            value : ch, 
-            position : generatePositionBetween(position1, position2, siteNumber )
-        }
-    } 
-    // writing before the first 0th index. Beginning of document when 
-    // 0th index is present
-    
-    else if (index === 0 && charMap[1] !== undefined ) {
-        let position2 = charMap[1]
-        charMap[index] = {
-            value : ch, 
-            position : generatePositionBetween([], position2, siteNumber )
-        }
-    }
-    // emit remote insertion
-} 
-
-//delete character at the index cursor postion
-function localDeleteChar(ch, index) {
-    //emit remote deletion  
-    delete charMap[index];
-}
-
-
-function insertRemoteChar(chObject) {
-    let position = chObject.position;
-    let ch = chObject.value;
-    // insert when no characters are present
-    
-    // insert b/w
-    // insert at the last
-    
-    for (var index in charMap) {
-        if (comparePosition(position, charMap[index].position) >= 0) {
-            // insert ch at index 
-            // editor.replaceRange(ch, editor.posFromIndex(index));
-            charMap.splice(index, 0, chObject);
-            return;
-        }
-    }
-
-    //insert ch at last index
-    charMap.push(chObject);
-}
-
-function deleteRemoteChar(chObject) {
-    let position = chObject.position;
-    let ch = chObject.value;
-    
-    for (var index in charMap) {
-        if (comparePosition(position, charMap[index].position) === 0 ) {
-            // delete ch at index
-            // let from = editor.posFromIndex(index);
-            // let to = editor.posFromIndex(index + 1);
-            // editor.replaceRange('', from, to);
-            charMap.splice(index, 1);
-            return;
-        }
-    }
-    console.log('Cant find delete character');
-}
