@@ -2,5 +2,6 @@ exports.keyNames = {
 	EDITOR : 'editor:', 
 	USERS : ':users:', 
 	CHANGES : ':changes:', 
-	VERSIONS : ':versions:'
+	VERSIONS : ':versions:', 
+	SITE: ':site:'
 };

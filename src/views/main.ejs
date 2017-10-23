@@ -105,13 +105,14 @@
 
 <script>
 var editor = null;
-var siteNumber = Math.floor(Math.random() * 100)
+// var siteNumber = Math.floor(Math.random() * 100)
 
 window.onload = function() {
     let data = JSON.parse(`<%- data%>`);
     const {
         editorObject,
-        userName
+        userName,
+        siteNumber
     } = data;
     console.log(editorObject, userName);
     const editorName = editorObject.editorName;
@@ -123,9 +124,6 @@ window.onload = function() {
     showUsers(editorName);
     showShareUrl(editorName);
     addMessage(`${userName} has joined the editor`);
-    // let options = {
-    //     origin: "http://localhost:8000/channel"
-    // }
 
     let textElement = document.getElementById("id_content");
     let settings = {
@@ -153,6 +151,9 @@ window.onload = function() {
     addTextToCodeMirror(editor, charMap);
 
 
+    // let options = {
+    //     origin: "http://localhost:8000/channel"
+    // }
     // sharejs.open(editorObject.editorName, 'text', options, (error, doc) => {
     //     if (error) {
     //         console.log(error);

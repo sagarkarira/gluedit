@@ -72,6 +72,7 @@ function getUserList(req, res) {
 
 async function initializeRunner(editorName, userName) {
 	let editorKey = parameters.keyNames.EDITOR + editorName;
+	let siteKey = editorKey + parameters.keyNames.SITE;
 	let usersKey = editorKey + parameters.keyNames.USERS;
 	let exists = await redisClient.existsAsync(editorKey);
 
@@ -84,6 +85,7 @@ async function initializeRunner(editorName, userName) {
 			charMap : []
 		};
 		await redisClient.setAsync(editorKey, JSON.stringify(editorObject));
+		await redisClient.setAsync(siteKey, "2");
 		if (userName === undefined) {
 			userName = `${animals()}`
 		}
@@ -91,7 +93,8 @@ async function initializeRunner(editorName, userName) {
 
 		return {
 			editorObject : editorObject, 
-			userName : userName
+			userName : userName,
+			siteNumber : 1
 		};
 	}
 
@@ -100,18 +103,19 @@ async function initializeRunner(editorName, userName) {
 
 	let userList =  await redisClient.smembersAsync(usersKey);
 	if (userName === undefined) {
-		userName = `${animals()}`
+		userName = `${animals()}`;
 	}
 	// fix duplicate problem bug 
 	// small chance that the random generated name is duplicated
 	await redisClient.saddAsync(usersKey, userName);
-
+	let siteNumber = await redisClient.getAsync(siteKey)
+	await redisClient.incrAsync(siteKey);
 	return { 
 		editorObject : editorObject, 
-		userName : userName
+		userName : userName, 
+		siteNumber : parseInt(siteNumber)
 	};
 }
-
 
 async function getUserListRunner(editorName) {
 	let editorKey = parameters.keyNames.EDITOR + editorName;

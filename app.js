@@ -32,10 +32,11 @@ const logger = require('./libs/logger');
 let logconf = {};
 // const mysql = require('./routes/dbHandler');
 
-const init = require('./routes/init');
-const editor = require('./routes/editor');
-const socket = require('./routes/socket');
 /** Routes **/
+const editor = require('./routes/editor');
+
+/** Socket **/
+const socket = require('./routes/socket');
 
 
 const app = express();
