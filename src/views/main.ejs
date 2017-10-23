@@ -87,7 +87,6 @@
 <script src="../lib/codemirror/mode/javascript/javascript.js"></script>
 
 <script src="../lib/codemirror/addon/selection/active-line.js"></script>
-<script src="../lib/codemirror/addon/edit/matchbrackets.js"></script>
 
 <!-- socket io script -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.3/socket.io.js"></script>
@@ -130,7 +129,6 @@ window.onload = function() {
         lineNumbers: true,
         mode:"javascript",
         styleActiveLine: true,
-        matchBrackets: true,
         lineWrapping: true,
         extraKeys: {"Ctrl-Space": "autocomplete"},
         extraKeys: {
