@@ -107,7 +107,7 @@ var editor = null;
 // var siteNumber = Math.floor(Math.random() * 100)
 
 window.onload = function() {
-    let data = JSON.parse(`<%- data%>`);
+    let data = `<%- data%>`;
     const {
         editorObject,
         userName,
@@ -206,12 +206,12 @@ window.onload = function() {
         })
 
         editor.on('change', (ed, data) =>{
-            console.log(data);
+            // console.log(data);
             let posFrom = data.from;
             let posTo = data.to;
             let index = editor.indexFromPos(posFrom);
             let indexTo = editor.indexFromPos(posTo);
-            console.log(index, indexTo);
+            // console.log(index, indexTo);
             let ch = data.text[0];
             let ch2 = data.text[1];
             if (data.origin === '+input') {
@@ -321,7 +321,7 @@ function addTextToCodeMirror(editor, charMap) {
 
 // inserting character ch at the index cursor postion.
 function localInsertChar(ch, index, socket, editorName, charMap, siteNumber) {
-    console.log(ch, index);
+    console.log('Local Insert', ch, index, JSON.stringify(charMap));
     let charObj = {};
     if (index === 0 && charMap[index] === undefined) {
         console.log('Document begin');
@@ -382,7 +382,8 @@ function localInsertChar(ch, index, socket, editorName, charMap, siteNumber) {
     // 0th index is present
     
     
-    console.log(charMap);
+    console.log('Local Insert Finish', JSON.stringify(charMap));
+
     socket.emit('change', {
         type : 'insert', 
         editorName : editorName, 
@@ -402,6 +403,7 @@ function localDeleteChar(ch, index, socket, editorName, charMap) {
 }
 
 function insertRemoteChar(charObj, charMap) {
+    console.log('Remote Insert Start', charObj, JSON.stringify(charMap));
     let position = charObj.position;
     let ch = charObj.value;
     // insert when no characters are present
@@ -409,23 +411,24 @@ function insertRemoteChar(charObj, charMap) {
     if (charMap.length === 0 ) {
         charMap[0] = charObj;
         editor.replaceRange(ch, editor.posFromIndex(0));
-        console.log('Remote insert at beginning ');
+        console.log('Remote insert at beginning');
         return;
     }
     // insert b/w    
     for (var index in charMap) {
         if (comparePosition(position, charMap[index].position) < 0) {
             // insert ch at index 
+            console.log('Remote insert in b/w at :', index);
             editor.replaceRange(ch, editor.posFromIndex(index));
             charMap.splice(index, 0, charObj);
-            console.log('Remote insert in b/w');
             return;
         }
     }
     //insert ch at last index
     charMap.push(charObj);
     editor.replaceRange(ch, editor.posFromIndex(charMap.length-1));
-    console.log('Remote insert at last index');
+    console.log('Remote insert at last index at:', index);
+    console.log('Remote insert Finish');
 }
 
 function deleteRemoteChar(charObj, charMap) {
@@ -438,7 +441,7 @@ function deleteRemoteChar(charObj, charMap) {
             // delete ch at index
             let from = editor.posFromIndex(parseInt(index));
             let to = editor.posFromIndex(parseInt(index) + 1);
-            console.log(index, from, to);
+            // console.log(index, from, to);
             editor.replaceRange('', from, to);
             charMap.splice(parseInt(index), 1);
             console.log('Remote delete');
