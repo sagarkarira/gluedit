@@ -5,6 +5,7 @@
 
 Another real time collabrative editor based on **Logoot CRDT algorithm.**
 
+![gluEdit](https://media.giphy.com/media/xT9IgDIoMnoo6fXvWw/giphy.gif)
 
 ## Getting Started
 
