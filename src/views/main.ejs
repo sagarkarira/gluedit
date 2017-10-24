@@ -53,11 +53,15 @@
             <textarea class="form-control" id="id_content"   name="content" >default text</textarea>
           </div>
           <div class="col-md-3">
+            <!-- list of users -->
             <div id="user_list">
               <h3> User List </h3>
               <ul></ul>
             </div>
-            <div>
+
+            <!-- chat box -->
+            <div id="chat_box">
+                <h3> Chat Box</h3>
               <ul id="message">
                 <li class="system">
                   <span class='text'> Chat box initialized </span>
@@ -71,6 +75,12 @@
                     </div>
                   </div>
                 </div>
+            </div>
+
+            <!-- document history list -->
+            <div id="version_list">
+                <h3>Document History </h3>
+                <ul></ul>
             </div>
 
           </div>
@@ -112,7 +122,8 @@ window.onload = function() {
     const {
         editorObject,
         userName,
-        siteNumber
+        siteNumber, 
+        totalVersions
     } = data;
     console.log(editorObject, userName);
     const editorName = editorObject.editorName;
@@ -121,6 +132,7 @@ window.onload = function() {
 
     showEditorName(editorName);
     showVersion(version);
+    showVersionList(totalVersions);
     showShareUrl(editorName);
     showUserName(userName);
     showUsers(editorName);
@@ -209,7 +221,15 @@ window.onload = function() {
             if (type === 'delete') {
                 deleteRemoteChar(charObj, charMap);
             }
-        })
+        });
+
+        $(".version").click((event)=>{
+            let version = parseInt($(event.target).attr('id'));
+            socket.emit('changeVersion', {
+                version : version, 
+                editorName : editorName     
+            });
+        });
 
         editor.on('change', (ed, data) =>{
             // console.log(data);
@@ -288,6 +308,13 @@ function showShareUrl(editorName) {
 function showVersion(version) {
     let elem = document.getElementById("version");
     elem.innerHTML += version;
+}
+
+function showVersionList(version) {
+    const elem = $("#version_list > ul");
+    for (let i=1; i<=version;i++) {
+        elem.append(`<li class="version" > <a id="${i}">Version : ${i} </a></li>`);
+    }
 }
 
 function userJoin(userName) {

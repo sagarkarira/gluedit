@@ -231,40 +231,50 @@ function deleteServerChar(charObj, charMap) {
 // there will only two case to handle
 function textToCharMap(text) {
     let charObj = {};
-    return charMap = text.split('').reduce((lastcharObj, ch, index)=>{
+    let charMap = []
+    text.split('').reduce((lastcharObj, ch, index)=>{
+        charMap.push()
+        console.log(lastcharObj, ch, index);
         // inserting at 1st position
         if (index === 0) {
             let beginPosition = [{
                 site : 0, 
                 digit : 1
             }];
-            return {
+            let charObj = {
                 value : ch, 
                 position : beginPosition   
             };   
+            charMap.push(charObj);
+            return charObj
         } 
         //inserting new characters
         else {
             if (ch === '\n') {
                 let nextDigit = lastcharObj.position[0].digit +1;
-                return {
+                let charObj = {
                     value : ch, 
                     position : [{
                         site : 0, 
                         digit : nextDigit
                     }]
-                };            
+                };
+                charMap.push(charObj);
+                return charObj;            
             } else {
                 let position1 = lastcharObj.position;
-                return {
+                let charObj =  {
                     value : ch, 
                     position : generatePositionBetween(position1, [], 0 )
                 };    
+                charMap.push(charObj);
+                return charObj;
             }        
         }
     }, {});
+    return charMap;
 } 
 
 // console.log(textToCharMap(`I am not sorry
-    // I am sorry`));
+//     I am sorry`));
 

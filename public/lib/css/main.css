@@ -12,6 +12,20 @@
   background: #FEE;
 }
 
+#version_list > h3 {
+  font-weight: bold;
+  font-size: 1.3em;
+  padding: 1em 0.5em;
+  background: #FEE;
+}
+
+#chat_box > h3 {
+    font-weight: bold;
+    font-size: 1.3em;
+    padding: 1em 0.5em;
+    background: #FEE;    
+}
+
 #user_list > ul {
   list-style: none;
   padding: 0;

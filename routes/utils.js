@@ -1,4 +1,8 @@
 'use strict';
+module.exports = {
+	keyNames
+};
+
 const parameters = require('./parameters');
 
 function keyNames(editorName) {

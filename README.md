@@ -25,7 +25,10 @@ Another real time collabrative editor based on **Logoot CRDT algorithm.**
 
 ### Todos 
 
-- Save versions of content at frequent interval. 
+- <s>Save versions of content at frequent interval.</s>
+- Frontend : Check for new version at regular interval. (Ajax call)
+- Save version for long documents more efficiently.
+- Dont save  version if document/editor is idle.
 - Listen for Undo, Paste, and selection deletion text change events for code mirror text box.
 - Not allow duplicate users.
 - Refactor, Writing Documentation and Tests

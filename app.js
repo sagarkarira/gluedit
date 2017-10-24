@@ -109,7 +109,7 @@ var options = {
 // })
 
 // seconds after document should saved
-const INTERVAL = 30 ;
+const INTERVAL = 60 ;
 setInterval(function() {
     editor.saveVersion().then(()=>{
         console.log('Saved');

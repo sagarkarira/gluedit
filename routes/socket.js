@@ -3,6 +3,32 @@ module.exports = {
 	realTime
 };
 
+/**
+ * // sending to sender-client only
+socket.emit('message', "this is a test");
+
+// sending to all clients, include sender
+io.emit('message', "this is a test");
+
+// sending to all clients except sender
+socket.broadcast.emit('message', "this is a test");
+
+// sending to all clients in 'game' room(channel) except sender
+socket.broadcast.to('game').emit('message', 'nice game');
+
+// sending to all clients in 'game' room(channel), include sender
+io.in('game').emit('message', 'cool game');
+
+// sending to sender client, only if they are in 'game' room(channel)
+socket.to('game').emit('message', 'enjoy the game');
+
+// sending to all clients in namespace 'myNamespace', include sender
+io.of('myNamespace').emit('message', 'gg');
+
+// sending to individual socketid
+socket.broadcast.to(socketid).emit('message', 'for your eyes only');
+ */
+
 const socket = require('socket.io');
 const logging = require('../libs/logger');
 const redisClient = require('./redis');
@@ -76,9 +102,10 @@ function realTime(server) {
 		});
 
 		client.on('changeVersion', (data)=>{
+			let {editorName} = data;
 			changeVersion(data)
 				.then(()=>{
-					client.to(editorName).emit('refresh');
+					io.to(editorName).emit('refresh');
 				})
 				.catch((error)=>{
 					logging.error(logconf, error);
@@ -88,10 +115,12 @@ function realTime(server) {
 }
 
 async function changeVersion(data) {
+	logging.trace(logconf, `Updating version`);
 	let {version, editorName} = data;
 	let {editorKey, versionKey} = utils.keyNames(editorName);
 	let text = await redisClient.lindexAsync(versionKey, -parseInt(version));
 	let charMap = logoot.textToCharMap(text);
+	logging.trace(logconf, versionKey, -parseInt(version), data, text, charMap );
 	let editorObject = {
 		editorName : editorName, 
 		version : version,  
