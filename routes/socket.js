@@ -8,6 +8,7 @@ const logging = require('../libs/logger');
 const redisClient = require('./redis');
 const parameters = require('./parameters');
 const logoot = require('./logoot');
+const utils = require('./utils');
 const Promise = require('bluebird');
 
 let logconf = {};
@@ -35,8 +36,8 @@ function realTime(server) {
 					logging.trace(logconf, `${userName} joined editor : ${editorName}`);
 				})
 				.catch((error)=>{
-					
-				})
+					logging.error(logconf, error);
+				});
 		});
 
 		client.on('disconnect', ()=>{
@@ -46,8 +47,8 @@ function realTime(server) {
 						`${result.userName} left the editor : ${result.editorName}`);
 				})
 				.catch((error)=>{
-					logging.trace(logconf, error);
-				})
+					logging.error(logconf, error);
+				});
 		});
 
 		client.on('change', (data)=>{
@@ -59,7 +60,7 @@ function realTime(server) {
 				})
 				.catch((error)=>{
 					logging.trace(logconf, error);
-				})
+				});
 		});
 
 		client.on('message', (data)=>{
@@ -73,11 +74,32 @@ function realTime(server) {
 				New message from ${userName}
 				Message : ${message}`);
 		});
-	
-	});
 
+		client.on('changeVersion', (data)=>{
+			changeVersion(data)
+				.then(()=>{
+					client.to(editorName).emit('refresh');
+				})
+				.catch((error)=>{
+					logging.error(logconf, error);
+				});
+		});
+	});
 }
 
+async function changeVersion(data) {
+	let {version, editorName} = data;
+	let {editorKey, versionKey} = utils.keyNames(editorName);
+	let text = await redisClient.lindexAsync(versionKey, -parseInt(version));
+	let charMap = logoot.textToCharMap(text);
+	let editorObject = {
+		editorName : editorName, 
+		version : version,  
+		charMap : charMap
+	};
+	await redisClient.setAsync(editorKey, JSON.stringify(editorObject));
+	return;
+}
 
 async function clientOnDisconnect(client) {
 	let clientId = client.id;
@@ -91,6 +113,13 @@ async function clientOnDisconnect(client) {
 	await redisClient.sremAsync(usersKey, userName);
 	client.to(editorName).broadcast.emit('userLeft', userName);	
 	await redisClient.delAsync(`socketId:${clientId}`);
+	//delete editing docs if all user left
+	
+	let totalUsers = await redisClient.scardAsync(usersKey);
+	if (totalUsers == 0 ) {
+		await redisClient.lremAsync('editing:', editorName);
+	}
+
 	return {userName, editorName};
 }
 

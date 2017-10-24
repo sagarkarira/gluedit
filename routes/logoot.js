@@ -1,6 +1,7 @@
 module.exports = {
     insertServerChar, 
-    deleteServerChar
+    deleteServerChar, 
+    textToCharMap
 };
 
 const BASE = 256;
@@ -223,3 +224,47 @@ function deleteServerChar(charObj, charMap) {
     console.error('Cant find delete character');
     return charMap;
 }
+
+// will be used to convert docSnapshot  to charMap for versioned docs
+// using siteNumber = 0 as everything is being reset
+// as the character will be coming sequentially 
+// there will only two case to handle
+function textToCharMap(text) {
+    let charObj = {};
+    return charMap = text.split('').reduce((lastcharObj, ch, index)=>{
+        // inserting at 1st position
+        if (index === 0) {
+            let beginPosition = [{
+                site : 0, 
+                digit : 1
+            }];
+            return {
+                value : ch, 
+                position : beginPosition   
+            };   
+        } 
+        //inserting new characters
+        else {
+            if (ch === '\n') {
+                let nextDigit = lastcharObj.position[0].digit +1;
+                return {
+                    value : ch, 
+                    position : [{
+                        site : 0, 
+                        digit : nextDigit
+                    }]
+                };            
+            } else {
+                let position1 = lastcharObj.position;
+                return {
+                    value : ch, 
+                    position : generatePositionBetween(position1, [], 0 )
+                };    
+            }        
+        }
+    }, {});
+} 
+
+// console.log(textToCharMap(`I am not sorry
+    // I am sorry`));
+

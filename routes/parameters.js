@@ -1,7 +1,7 @@
 exports.keyNames = {
-	EDITOR : 'editor:', 
-	USERS : ':users:', 
-	CHANGES : ':changes:', 
-	VERSIONS : ':versions:', 
-	SITE: ':site:'
+	EDITOR : 'editor:', 	// object/string
+	USERS : ':users:', 		// set
+	CHANGES : ':changes:',  // @todo
+	VERSIONS : ':versions:', // list
+	SITE: ':site:'	
 };

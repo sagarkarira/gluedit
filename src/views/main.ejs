@@ -46,9 +46,10 @@
         <div class="row">
           <div class="col-md-9">
             <p id="editor_name">Editor Name : </p>
+            <p id="version">Version : </p>
             <p id="user_name">User Name : </p>
-            <p id="share_url">Share URL: </p>
-
+            <p id="share_url">Share URL : </p>
+            
             <textarea class="form-control" id="id_content"   name="content" >default text</textarea>
           </div>
           <div class="col-md-3">
@@ -115,13 +116,14 @@ window.onload = function() {
     } = data;
     console.log(editorObject, userName);
     const editorName = editorObject.editorName;
+    const version = editorObject.version;
     const charMap = editorObject.charMap;
 
-
     showEditorName(editorName);
+    showVersion(version);
+    showShareUrl(editorName);
     showUserName(userName);
     showUsers(editorName);
-    showShareUrl(editorName);
     addMessage(`${userName} has joined the editor`);
 
     let textElement = document.getElementById("id_content");
@@ -185,6 +187,10 @@ window.onload = function() {
             console.log(message);
             userLeft(userName);
             addMessage(message);
+        });
+
+        socket.on('refresh', ()=>{
+            location.reload();
         });
 
         // add message to chat box
@@ -279,6 +285,10 @@ function showShareUrl(editorName) {
     elem.innerHTML += window.location.href;
 }
 
+function showVersion(version) {
+    let elem = document.getElementById("version");
+    elem.innerHTML += version;
+}
 
 function userJoin(userName) {
     $("#user_list > ul").append(`<li id="${userName}"> ${userName} </li> `);
