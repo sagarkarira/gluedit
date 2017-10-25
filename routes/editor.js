@@ -37,6 +37,9 @@ function initialize(req, res) {
 	if (editorName === undefined) {
 		logging.error(logconf, "Editor name is undefined");
 	}
+	if (userName !== undefined) {
+		userName = userName.replace(/ /g,"_");
+	}
 	
 	initializeRunner(editorName, userName)
 		.then((result)=>{
@@ -144,14 +147,20 @@ async function saveVersion() {
 	let openEditors = await redisClient.lrangeAsync('editing:', 0, -1); 
 	for ( let index in openEditors) {
 		let editorName = openEditors[index];
+		let {editorKey, versionKey} = utils.keyNames(editorName);
 		logging.trace(logconf, `Saving version for ${editorName}`);
 		let text = await getDocSnapshot(editorName);
 		// dont version if document is empty
 		if (text === "") {
 			continue;
 		}
-		let editorKey = parameters.keyNames.EDITOR + editorName 
-		let versionKey = editorKey + parameters.keyNames.VERSIONS
+		// dont version when no changes has been made.
+		// let length = await redisClient.llenAsync(versionKey);
+		let getLatestVersion = await redisClient.lindexAsync(versionKey, 0);
+
+		if (text === getLatestVersion) {
+			continue;					
+		}		
 		await redisClient.lpushAsync(versionKey, text);		
 	}
 	logging.trace(logconf, 'Saved version for all documents');
